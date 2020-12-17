@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<title>Hello!</title>
+	<meta content="text/html;charset=utf-8" http-equiv="Content-Type">
+	<meta content="utf-8" http-equiv="encoding">
+	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet"
+		integrity="sha384-giJF6kkoqNQ00vy+HMDP7azOuL0xtbfIcaT9wjKHr8RbDVddVHyTfAAsrekwKmP1" crossorigin="anonymous">
+</head>
+
+<body>
+
+	<div class="row justify-content-md-center">
+		<div class="col-md-auto">
+			<h1>Medição Altura do Pasto</h1>
+		</div>
+  </div>
+
+	<form id="formData" action="" enctype="multipart/form-data" method="POST"></form>
+	<div class="container-sm p-3 my-3 border">
+		<div class="row">
+			<div class="col align-self-center">
+				<div class="mb-3">
+					<label for="largura" class="form-label">Largura</label>
+					<input type="number" step="0.01" class="form-control" id="largura" name="largura"
+						placeholder="Largura da barra de referência (cm)" required>
+				</div>
+				<div class="mb-3">
+					<label for="altura" class="form-label">Altura</label>
+					<input type="number" step="0.01" class="form-control" id="altura" name="largura"
+						placeholder="Altura da barra de referência (cm)" required>
+				</div>
+				<div class="mb-3">
+					<label for="imagem" class="form-label">Imagem</label>
+					<input type="file" accept=".jpg, .png, .jpeg" class="form-control" id="imagem" name="imagem" required>
+				</div>
+				<button type="button" class="btn btn-primary" onclick="queryUpload()">Enviar</button>
+			</div>
+		</div>
+	</div>
+	</form>
+	<div class="row justify-content-md-center">
+		<div class="col-md-auto" id="response">
+		</div>
+  </div>
+
+	<script type="text/javascript">
+		function queryServer() {
+			const Http = new XMLHttpRequest();
+			const url = "/api/";
+			Http.open("GET", url);
+			Http.send();
+
+			Http.onreadystatechange = (e) => {
+				document.getElementById('response').innerHTML = Http.responseText;
+			}
+		}
+
+
+		function queryUpload() {
+			const Http = new XMLHttpRequest();
+			const url = "/api/upload";
+
+			const imagem = document.getElementById("imagem").files[0]
+			const largura = document.getElementById("largura").value
+			const altura = document.getElementById("altura").value
+
+			let formData = new FormData()
+			formData.append("imagem", imagem)
+			formData.append("largura", largura)
+			formData.append("altura", altura)
+
+			Http.responseType = "blob"
+			Http.open("POST", "/api/upload")
+			Http.send(formData);
+
+			Http.onreadystatechange = (e) => {
+				let response = Http.response
+				const img = document.createElement("img")
+				img.src = URL.createObjectURL(response)
+				img.id = "imageResponse"
+				img.width = 800
+				img.height = 600
+
+				if(document.getElementById("imageResponse")){
+					document.getElementById("imageResponse").remove()
+				}
+
+				let responseDiv = document.getElementById("response")
+				responseDiv.appendChild(img)
+				URL.revokeObjectURL(objectURL)
+			}
+		}
+	</script>
+
+</body>
+</html>
